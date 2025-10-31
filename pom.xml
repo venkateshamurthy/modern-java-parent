@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.venkateshamurthy</groupId>
+    <artifactId>modern-java-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Modern Java Parent</name>
+    <description>Parent POM for Java 17 libraries: Lombok, JUnit5, SLF4J/Log4j2, Jackson, Units, Sonatype Central
+        publishing, SonarQube.
+    </description>
+    <url>https://github.com/venkateshamurthy/modern-java-parent</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>venkateshamurthy</id>
+            <name>Venkatesha Murthy</name>
+            <email>venkateshamurthyts@gmail.com</email>
+            <organizationUrl>https://github.com/venkateshamurthy</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/venkateshamurthy/modern-java-parent.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/venkateshamurthy/modern-java-parent.git</developerConnection>
+        <url>https://github.com/venkateshamurthy/modern-java-parent</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+
+        <!-- Library versions (centralized) -->
+        <junit.jupiter.version>5.10.2</junit.jupiter.version>
+        <surefire.version>3.2.5</surefire.version>
+        <jacoco.version>0.8.13</jacoco.version>
+        <lombok.version>1.18.34</lombok.version>
+        <jackson.version>2.18.1</jackson.version>
+        <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
+        <unit.api.version>2.2</unit.api.version>
+        <unit.ri.version>2.2</unit.ri.version>
+        <slf4j.version>2.0.16</slf4j.version>
+        <log4j.version>2.24.0</log4j.version>
+        <commons.lang3.version>3.17.0</commons.lang3.version>
+        <commons.collections4.version>4.5.0-M2</commons.collections4.version>
+        <rxjava.version>3.1.9</rxjava.version>
+        <resilience4j.version>2.2.0</resilience4j.version>
+        <vavr.version>0.10.4</vavr.version>
+        <sonar.plugin.version>3.10.0.2594</sonar.plugin.version>
+        <central-publish.version>0.9.0</central-publish.version>
+        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-shade-plugin.version>3.5.3</maven-shade-plugin.version>
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    </properties>
+
+    <!-- Do NOT force dependencies on children; provide versions here for easy import -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <!-- Jackson -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- Jakarta + Units -->
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta.annotation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.measure</groupId>
+                <artifactId>unit-api</artifactId>
+                <version>${unit.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tech.units</groupId>
+                <artifactId>indriya</artifactId>
+                <version>${unit.ri.version}</version>
+            </dependency>
+
+            <!-- Utilities -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons.collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.reactivex.rxjava3</groupId>
+                <artifactId>rxjava</artifactId>
+                <version>${rxjava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-all</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vavr</groupId>
+                <artifactId>vavr</artifactId>
+                <version>${vavr.version}</version>
+            </dependency>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <!-- Children inherit these plugins automatically -->
+        <plugins>
+            <!-- Compiler with Lombok annotation processor -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- JUnit 5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+
+            <!-- Jacoco coverage -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <!-- instrument tests -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- create reports after tests -->
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <haltOnFailure>true</haltOnFailure>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <excludes>
+                                        <exclude>*Test</exclude>
+                                    </excludes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.9</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.9</minimum>
+                                        </limit>
+                                        <!--excludes>
+                                            <exclude>com.xyz.ClassToExclude</exclude>
+                                        </excludes-->
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                </configuration>
+            </plugin>
+
+            <!-- Sources + Javadoc for Central -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Jar manifest / reproducible builds -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Sonatype Central Publishing -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>${central-publish.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                </configuration>
+            </plugin>
+
+            <!-- GPG signing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- SonarQube -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar.plugin.version}</version>
+            </plugin>
+        </plugins>
+
+        <!-- Shade is provided but opt-in via profile -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
+                    <configuration>
+                        <createDependencyReducedPom>true</createDependencyReducedPom>
+                        <filters>
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludes>
+                                    <exclude>META-INF/*.SF</exclude>
+                                    <exclude>META-INF/*.DSA</exclude>
+                                    <exclude>META-INF/*.RSA</exclude>
+                                </excludes>
+                            </filter>
+                        </filters>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <!-- Optional profile to build a fat-jar when a child needs it -->
+    <profiles>
+        <profile>
+            <id>shade</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
+
