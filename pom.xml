@@ -6,12 +6,15 @@
 
     <groupId>io.github.venkateshamurthy</groupId>
     <artifactId>modern-java-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <name>Modern Java Parent</name>
-    <description>Parent POM for Java 17 libraries: Lombok, JUnit5, SLF4J/Log4j2, Jackson, Units, Sonatype Central
-        publishing, SonarQube.
+    <description>
+        A reusable parent POM for modern Java libraries — Java 17, JUnit 5, Lombok, SLF4J/Log4j2,
+        Jackson, Commons, RxJava3, Resilience4j, Vavr, Sonatype Central, and SonarQube ready.
+        Please note (as is common in maven projects) since all dependencies are declared within dependencyManagement
+        and hence you need to declare again the dependency in your pom just with groupId and artifactId.
     </description>
     <url>https://github.com/venkateshamurthy/modern-java-parent</url>
 
@@ -19,6 +22,7 @@
         <license>
             <name>Apache License, Version 2.0</name>
             <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
@@ -27,9 +31,16 @@
             <id>venkateshamurthy</id>
             <name>Venkatesha Murthy</name>
             <email>venkateshamurthyts@gmail.com</email>
+            <organization>GitHub</organization>
             <organizationUrl>https://github.com/venkateshamurthy</organizationUrl>
+            <roles><role>developer</role></roles>
         </developer>
     </developers>
+
+    <organization>
+        <name>Venkatesha Murthy</name>
+        <url>https://github.com/venkateshamurthy</url>
+    </organization>
 
     <scm>
         <connection>scm:git:https://github.com/venkateshamurthy/modern-java-parent.git</connection>
@@ -38,11 +49,23 @@
         <tag>HEAD</tag>
     </scm>
 
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/venkateshamurthy/modern-java-parent/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>GitHub Actions</system>
+        <url>https://github.com/venkateshamurthy/modern-java-parent/actions</url>
+    </ciManagement>
+
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>${java.version}</maven.compiler.release>
-
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <!-- Library versions (centralized) -->
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <surefire.version>3.2.5</surefire.version>
@@ -67,6 +90,18 @@
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <commons-text.version>1.14.0</commons-text.version>
+        <swagger-annotations.version>2.2.39</swagger-annotations.version>
+        <spring-web.version>6.2.8</spring-web.version>
+        <mockito-core.version>5.14.2</mockito-core.version>
+        <assertj-core.version>3.26.0</assertj-core.version>
+        <commons-math3.version>3.6.1</commons-math3.version>
+        <jackson-datatype-jsr310.version>2.16.1</jackson-datatype-jsr310.version>
+        <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
+        <exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
+        <guava.version>33.4.8-jre</guava.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
     </properties>
 
     <!-- Do NOT force dependencies on children; provide versions here for easy import -->
@@ -101,9 +136,21 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson-datatype-jsr310.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
 
             <!-- Jakarta + Units -->
@@ -123,7 +170,12 @@
                 <version>${unit.ri.version}</version>
             </dependency>
 
-            <!-- Utilities -->
+            <!-- Apache commons -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commons-text.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -135,6 +187,20 @@
                 <version>${commons.collections4.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${commons-math3.version}</version>
+            </dependency>
+
+            <!-- Google guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!-- RxJava, Resilience4J, io.vavr -->
+            <dependency>
                 <groupId>io.reactivex.rxjava3</groupId>
                 <artifactId>rxjava</artifactId>
                 <version>${rxjava.version}</version>
@@ -145,16 +211,56 @@
                 <version>${resilience4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-rxjava3</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.vavr</groupId>
                 <artifactId>vavr</artifactId>
                 <version>${vavr.version}</version>
             </dependency>
 
+            <!-- Spring and Swagger -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring-web.version}</version>
+            </dependency>
+
             <!-- Testing -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.jupiter.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
                 <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito-core.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj-core.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -176,6 +282,11 @@
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
+                        </path>
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <arg>-parameters</arg>
@@ -183,7 +294,7 @@
                 </configuration>
             </plugin>
 
-            <!-- JUnit 5 -->
+            <!-- Testing: JUnit 5 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -193,7 +304,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Jacoco coverage -->
+            <!-- JaCoCo coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -206,20 +317,15 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <!-- create reports after tests -->
                     <execution>
                         <id>report</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
+                        <phase>prepare-package</phase>
+                        <goals><goal>report</goal></goals>
                     </execution>
                     <execution>
                         <id>check</id>
                         <phase>test</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
+                        <goals><goal>check</goal></goals>
                         <configuration>
                             <haltOnFailure>true</haltOnFailure>
                             <rules>
@@ -254,6 +360,13 @@
                 </configuration>
             </plugin>
 
+            <!-- Site plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site-plugin.version}</version>
+            </plugin>
+
             <!-- Sources + Javadoc for Central -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -263,9 +376,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
+                        <goals><goal>jar-no-fork</goal></goals>
                     </execution>
                 </executions>
             </plugin>
@@ -276,9 +387,7 @@
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
+                        <goals><goal>jar</goal></goals>
                     </execution>
                 </executions>
             </plugin>
@@ -306,6 +415,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
+                    <deploymentName>${groupId}:${artifactId}:${version}</deploymentName>
                     <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
@@ -319,9 +429,15 @@
                     <execution>
                         <id>sign-artifacts</id>
                         <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
+                        <goals><goal>sign</goal></goals>
+                        <configuration>
+                            <keyname>${gpg.keyname}</keyname>  <!-- Use the property from settings.xml -->
+                            <passphraseServerId>gpg.passphrase</passphraseServerId> <!-- Match the server ID in settings.xml -->
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -337,6 +453,14 @@
         <!-- Shade is provided but opt-in via profile -->
         <pluginManagement>
             <plugins>
+                <!-- Versioning -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${versions-maven-plugin.version}</version>
+                </plugin>
+
+                <!-- Shade fat jar making -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -358,6 +482,16 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <!-- Optional profile to build a fat-jar when a child needs it -->
     <profiles>

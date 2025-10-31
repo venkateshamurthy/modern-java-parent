@@ -1,0 +1,158 @@
+name: Build, Semantic Version, and Publish (Maven Central + GitHub Packages)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:   # allow manual trigger
+
+jobs:
+  release:
+    name: Semantic Version + Verify + Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      # ==============================================================
+      # 1️⃣ Checkout source
+      # ==============================================================
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # ==============================================================
+      # 2️⃣ Set up Java environment
+      # ==============================================================
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      # ==============================================================
+      # 3️⃣ Determine next semantic version
+      # --------------------------------------------------------------
+      # Uses the latest Git tag and last commit message to bump version:
+      #   - BREAKING CHANGE → major
+      #   - feat: → minor
+      #   - fix:  → patch
+      #   - anything else → patch
+      # ==============================================================
+      - name: Determine next semantic version
+        id: version
+        run: |
+          TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "Current tag: $TAG"
+          VERSION=${TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+          MSG=$(git log -1 --pretty=%B)
+          echo "Last commit message: $MSG"
+
+          if echo "$MSG" | grep -q "BREAKING CHANGE"; then
+            MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0
+            echo "Detected major change"
+          elif echo "$MSG" | grep -iq "^feat:"; then
+            MINOR=$((MINOR+1)); PATCH=0
+            echo "Detected feature change"
+          elif echo "$MSG" | grep -iq "^fix:"; then
+            PATCH=$((PATCH+1))
+            echo "Detected fix change"
+          else
+            PATCH=$((PATCH+1))
+            echo "Defaulting to patch bump"
+          fi
+
+          NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "Next version: $NEXT_VERSION"
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+
+      # ==============================================================
+      # 4️⃣ Bump version in pom.xml using versions-maven-plugin
+      # ==============================================================
+      - name: Bump Maven version
+        run: |
+          mvn -B versions:set -DnewVersion=${{ steps.version.outputs.next_version }}
+          mvn -B versions:commit
+
+      # ==============================================================
+      # 5️⃣ Import GPG private key for signing
+      # ==============================================================
+      - name: Import GPG private key
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format=long
+
+      # ==============================================================
+      # 6️⃣ Build and verify artifacts
+      # ==============================================================
+      - name: Build and verify
+        env:
+          MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_KEYNAME: ${{ secrets.MAVEN_GPG_KEYNAME }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: mvn -B clean verify -P release-profile
+
+      # ==============================================================
+      # 7️⃣ Optional: SonarCloud static analysis
+      # ==============================================================
+      - name: SonarCloud analysis
+        if: secrets.SONAR_TOKEN != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # built-in token
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      # ==============================================================
+      # 8️⃣ Deploy signed artifacts to Maven Central
+      # ==============================================================
+      - name: Deploy to Maven Central
+        env:
+          MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_KEYNAME: ${{ secrets.MAVEN_GPG_KEYNAME }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: mvn -B deploy -P release-profile
+
+      # ==============================================================
+      # 9️⃣ Deploy to GitHub Packages
+      # --------------------------------------------------------------
+      # Requires GH_TOKEN (PAT) with write:packages scope
+      # ==============================================================
+      - name: Deploy to GitHub Packages
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          MAVEN_GPG_KEYNAME: ${{ secrets.MAVEN_GPG_KEYNAME }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          mvn -B deploy \
+            -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository }}
+
+      # ==============================================================
+      # 🔟 Commit and tag the new version
+      # ==============================================================
+      - name: Commit and tag new version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pom.xml
+          git commit -m "chore: release v${{ steps.version.outputs.next_version }}" || echo "No changes to commit"
+          git tag v${{ steps.version.outputs.next_version }}
+          git push origin main --tags
+
+      # ==============================================================
+      # 1️⃣1️⃣ Generate and publish Javadocs to GitHub Pages
+      # ==============================================================
+      - name: Generate Javadocs
+        run: mvn -B javadoc:javadoc
+
+      - name: Publish Javadocs to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/site/apidocs
+          commit_message: "Update API docs for v${{ steps.version.outputs.next_version }}"
