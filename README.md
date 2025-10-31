@@ -1,5 +1,5 @@
 ## Parent Maven POM for Java Projects
-This POM can be leveraged as a base POM while building java projects.
+This POM can be leveraged as a foundational base POM while building java projects.
 
 ### Core dependencies
 - ✅ Java 17 
