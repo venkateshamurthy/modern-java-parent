@@ -1,6 +1,7 @@
 ## Parent Maven POM for Java Projects
-### Core dependencies
+This POM can be leveraged as a base POM while building java projects.
 
+### Core dependencies
 - ✅ Java 17 
 - ✅ JUnit 5 + Surefire 
 - ✅ Lombok (Annotation Processor wired into compiler)
