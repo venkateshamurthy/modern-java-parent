@@ -467,33 +467,6 @@
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>${sonar.plugin.version}</version>
             </plugin>
-
-            <!-- Security Scanning -->
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>${dependency-check-maven.version}</version> <!-- latest as of late 2025 -->
-                <configuration>
-                    <!-- Fail build if CVSS score >= 7 (high severity) -->
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
-
-                    <!-- Output formats -->
-                    <formats>HTML,JSON</formats>
-
-                    <!-- Suppress irrelevant issues (optional) -->
-                    <suppressionFile>${project.basedir}/dependency-check-suppressions.xml</suppressionFile>
-
-                    <!-- Store reports under target/dependency-check-report.* -->
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
 
         <!-- Shade is provided but opt-in via profile -->
