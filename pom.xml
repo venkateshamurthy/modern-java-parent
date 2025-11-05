@@ -6,7 +6,7 @@
 
     <groupId>io.github.venkateshamurthy</groupId>
     <artifactId>modern-java-parent</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
     <packaging>pom</packaging>
 
     <name>Modern Java Parent</name>
@@ -105,6 +105,8 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
         <dependency-check-maven.version>12.1.0</dependency-check-maven.version>
+
+        <nvd.ApiKey>${env.NVD_API_KEY}</nvd.ApiKey>
     </properties>
 
     <!-- Do NOT force dependencies on children; provide versions here for easy import -->
@@ -536,7 +538,7 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
                             <autoUpdate>true</autoUpdate>
-                            <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
+                            <nvdApiKey>${nvd.ApiKey}</nvdApiKey>
                             <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
                         </configuration>
                         <executions>
