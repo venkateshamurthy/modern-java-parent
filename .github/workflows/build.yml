@@ -42,22 +42,6 @@ jobs:
       - name: Verify project with tests and JaCoCo
         run: mvn -B clean verify
 
-      - name: Upload JaCoCo HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: target/site/jacoco/
-
-      - name: SonarCloud Analysis
-        if: env.SONAR_TOKEN != '' && github.event_name != 'pull_request'
-        env:
-          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
-        run: |
-          mvn -B sonar:sonar \
-            -Dsonar.projectKey=io.github.venkateshamurthy:${{ github.event.repository.name }} \
-            -Dsonar.organization=${{ env.SONAR_ORG }} \
-            -Dsonar.host.url=https://sonarcloud.io
 
   publish:
     name: Publish to Sonatype Central
