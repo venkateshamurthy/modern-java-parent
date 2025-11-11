@@ -105,7 +105,6 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
         <dependency-check-maven.version>12.1.0</dependency-check-maven.version>
-
         <nvd.ApiKey>${env.NVD_API_KEY}</nvd.ApiKey>
     </properties>
 
@@ -433,7 +432,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <deploymentName>${groupId}:${artifactId}:${version}</deploymentName>
+                    <deploymentName>${project.groupId}:${project.artifactId}:${project.version}</deploymentName>
                     <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
