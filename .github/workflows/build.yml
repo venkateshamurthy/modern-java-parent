@@ -11,6 +11,17 @@ jobs:
   build:
     name: Build and Verify
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
+      MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+      MAVEN_GPG_KEYNAME: ${{ secrets.MAVEN_GPG_KEYNAME }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_ORG: ${{ secrets.SONAR_ORG }}
+      NVD_API_EKY: ${{ secrets.NVD_API_KEY }}
 
     steps:
       - name: Checkout source
@@ -25,7 +36,7 @@ jobs:
           server-id: central                # for Sonatype
           server-username: MAVEN_CENTRAL_USER
           server-password: MAVEN_CENTRAL_TOKEN
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Verify project with tests and JaCoCo
@@ -41,11 +52,11 @@ jobs:
       - name: SonarCloud Analysis
         if: env.SONAR_TOKEN != '' && github.event_name != 'pull_request'
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         run: |
           mvn -B sonar:sonar \
             -Dsonar.projectKey=io.github.venkateshamurthy:${{ github.event.repository.name }} \
-            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
+            -Dsonar.organization=${{ env.SONAR_ORG }} \
             -Dsonar.host.url=https://sonarcloud.io
 
   publish:
@@ -67,9 +78,9 @@ jobs:
           server-id: central
           server-username: MAVEN_CENTRAL_USER
           server-password: MAVEN_CENTRAL_TOKEN
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Deploy to Sonatype Central
-        run: mvn -B clean deploy -DskipTests=true -Dgpg.passphrase=${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: mvn -B clean deploy -DskipTests=true -Dgpg.passphrase=${{ env.MAVEN_GPG_PASSPHRASE }}
 
